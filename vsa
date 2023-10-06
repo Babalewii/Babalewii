@@ -1,0 +1,49 @@
+
+# Hypothetical price and volume data (replace with real market data)
+price_data = [100, 101, 102, 105, 103, 107, 106, 110, 112, 115]
+volume_data = [1000, 1100, 1200, 1500, 1300, 1700, 1600, 1800, 1900, 2000]
+
+# Simulated trading function based on VSA
+def vsa_trading_strategy(price_data, volume_data):
+    # Define parameters (adjust as needed)
+    entry_threshold = 1.5  # Volume multiplier for entry signals
+    exit_threshold = 1.0   # Volume multiplier for exit signals
+    stop_loss_percentage = 2  # Percentage-based stop loss
+
+    # Initialize positions and trading variables
+    position = 0  # 0 for no position, 1 for long, -1 for short
+    entry_price = 0
+    stop_loss = 0
+
+    for i in range(1, len(price_data)):
+        # Calculate volume ratio
+        volume_ratio = volume_data[i] / volume_data[i - 1]
+
+        # Check for a buy signal (bullish VSA)
+        if volume_ratio > entry_threshold:
+            if position != 1:  # If not already long
+                position = 1  # Enter a long position
+                entry_price = price_data[i]
+                stop_loss = entry_price * (1 - stop_loss_percentage / 100)
+                print(f"Buy at {entry_price}, Stop Loss: {stop_loss}")
+
+        # Check for a sell signal (bearish VSA)
+        elif volume_ratio < 1 / entry_threshold:
+            if position != -1:  # If not already short
+                position = -1  # Enter a short position
+                entry_price = price_data[i]
+                stop_loss = entry_price * (1 + stop_loss_percentage / 100)
+                print(f"Sell at {entry_price}, Stop Loss: {stop_loss}")
+
+        # Check for an exit signal (reversal or profit-taking)
+        elif (
+            position == 1 and volume_ratio < exit_threshold
+        ) or (
+            position == -1 and volume_ratio > 1 / exit_threshold
+        ):
+            position = 0  # Close the position
+            exit_price = price_data[i]
+            print(f"Exit at {exit_price}")
+
+# Run the trading strategy with the sample data
+vsa_trading_strategy(price_data, volume_data)
